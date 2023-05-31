@@ -3,8 +3,9 @@ package main
 import (
 	"fmt"
 	"net/http"
-	"os"
 
+	krakenaugen "github.com/mochaeng/krakenaugen/core"
+	node_wrapper "github.com/mochaeng/krakenaugen/node-wrapper"
 	"golang.org/x/net/html"
 )
 
@@ -40,17 +41,32 @@ func ScrapeAndParseHTML(url string) (*html.Node, error) {
 	return htmlDoc, nil
 }
 
-const link = "https://www.reddit.com/r/tzuyu/comments/13i9o50/200321_tzuyu/"
+// const link = "https://www.reddit.com/r/tzuyu/comments/13j02bt/181128_tzuyu/"
+const link = "https://www.factretriever.com/rhino-facts"
+
+type Question struct {
+	question string
+}
+
+var allQuestions []string
 
 func main() {
-	links := []string{link}
+	// links := []string{link}
 
-	for _, url := range links {
-		htmlDoc, err := ScrapeAndParseHTML(url)
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "Error while scrape into html: %v\n", err)
-		}
-		TraverseHTML(htmlDoc)
-	}
-	fmt.Println(links)
+	// for _, url := range links {
+	// 	htmlDoc, err := ScrapeAndParseHTML(url)
+	// 	if err != nil {
+	// 		fmt.Fprintf(os.Stderr, "Error while scrape into html: %v\n", err)
+	// 	}
+	// 	TraverseHTML(htmlDoc)
+	// }
+
+	kraken := krakenaugen.CreateNewAugen(link)
+
+	kraken.OnHTML("factsList", func(node *node_wrapper.KrakenNode) {
+		text := node.InnerText()
+		fmt.Println(text)
+	})
+
+	fmt.Println(kraken)
 }
