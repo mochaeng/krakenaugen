@@ -2,8 +2,10 @@ package krakenaugen
 
 import (
 	"fmt"
+	"os"
 
 	node_wrapper "github.com/mochaeng/krakenaugen/node-wrapper"
+	"github.com/mochaeng/krakenaugen/selectors"
 	"github.com/mochaeng/krakenaugen/traversal"
 )
 
@@ -16,9 +18,18 @@ func CreateNewAugen(startURL string) *Kraken {
 	return &Kraken{StartURL: startURL}
 }
 
-func (k *Kraken) OnHTML(class string, onEach func(node *node_wrapper.KrakenNode)) {
+func (k *Kraken) OnHTML(rawSelector string, onEach func(node *node_wrapper.KrakenNode)) {
 	// Visit(k.StartURL, tag, onEach)
 	// traversal.Visit()
-	traversal.Visit(k.StartURL, class, onEach)
-	fmt.Println("Going to visit: ", k.StartURL)
+	// selector := selectors.BuildSelector(cssSelector)
+
+	matcher := selectors.BuildMatcher(rawSelector)
+
+	// fmt.Println(matcher)
+
+	err := traversal.Visit(k.StartURL, matcher, onEach)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "error: %v", err)
+	}
+
 }
